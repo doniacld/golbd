@@ -17,3 +17,9 @@ rpm: srpm
 
 clean:
 	rm -rf build vendor
+
+test:
+	go test ./...
+
+build:
+	go build cmd/main.go
