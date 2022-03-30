@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"lb-experts/golbd/lbcluster"
-	"lb-experts/golbd/lbconfig"
+	"gitlab.cern.ch/lb-experts/golbd/lbcluster"
+	"gitlab.cern.ch/lb-experts/golbd/lbconfig"
 )
 
 var (
