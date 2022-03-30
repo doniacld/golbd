@@ -1,11 +1,8 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io/ioutil"
-	"log/syslog"
-	"math/rand"
 	"os"
 	"os/signal"
 	"regexp"
@@ -18,26 +15,6 @@ import (
 	"gitlab.cern.ch/lb-experts/golbd/lbconfig"
 	"gitlab.cern.ch/lb-experts/golbd/lbhost"
 )
-
-var (
-	// Version number
-	// This should be overwritten with `go build -ldflags "-X main.Version='HELLO_THERE'"`
-	Version = "head"
-	// Release number
-	// It should also be overwritten
-	Release = "no_release"
-
-	versionFlag    = flag.Bool("version", false, "print lbd version and exit")
-	debugFlag      = flag.Bool("debug", false, "set lbd in debug mode")
-	startFlag      = flag.Bool("start", false, "start lbd")
-	stopFlag       = flag.Bool("stop", false, "stop lbd")
-	updateFlag     = flag.Bool("update", false, "update lbd config")
-	configFileFlag = flag.String("config", "./load-balancing.conf", "specify configuration file path")
-	logFileFlag    = flag.String("log", "./lbd.log", "specify log file path")
-	stdoutFlag     = flag.Bool("stdout", false, "send log to stdtout")
-)
-
-const itCSgroupDNSserver string = "cfmgr.cern.ch"
 
 func shouldUpdateDNS(config *lbconfig.Config, hostname string, lg *lbcluster.Log) bool {
 	if hostname == config.Master {
@@ -159,54 +136,6 @@ func sleep(seconds time.Duration, chanModified chan int) error {
 	return nil
 }
 
-func main() {
-	flag.Parse()
-	if *versionFlag {
-		fmt.Printf("This is a proof of concept golbd version: %s-%s \n", Version, Release)
-		os.Exit(0)
-	}
-	rand.Seed(time.Now().UTC().UnixNano())
-	log, e := syslog.New(syslog.LOG_NOTICE, "lbd")
-
-	if e != nil {
-		fmt.Printf("Error getting a syslog instance %v\nThe service will only write to the logfile %v\n\n", e, *logFileFlag)
-	}
-	lg := lbcluster.Log{SyslogWriter: log, Stdout: *stdoutFlag, Debugflag: *debugFlag, TofilePath: *logFileFlag}
-
-	lg.Info("Starting lbd")
-
-	//	var sig_hup, sig_term bool
-	// installSignalHandler(&sig_hup, &sig_term, &lg)
-
-	config, lbclusters, err := lbconfig.LoadConfig(*configFileFlag, &lg)
-	if err != nil {
-		lg.Warning("loadConfig Error: ")
-		lg.Warning(err.Error())
-		os.Exit(1)
-	}
-	lg.Info("Clusters loaded")
-
-	doneChan := make(chan int)
-	go watchFile(*configFileFlag, doneChan)
-	go sleep(10, doneChan)
-
-	for {
-		myValue := <-doneChan
-		if myValue == 1 {
-			lg.Info("Config Changed")
-			config, lbclusters, err = lbconfig.LoadConfig(*configFileFlag, &lg)
-			if err != nil {
-				lg.Error(fmt.Sprintf("Error getting the clusters (something wrong in %v", configFileFlag))
-			}
-		} else if myValue == 2 {
-			checkAliases(config, lg, lbclusters)
-		} else {
-			lg.Error("Got an unexpected value")
-		}
-	}
-	lg.Error("The lbd is not supposed to stop")
-
-}
 func checkAliases(config *lbconfig.Config, lg lbcluster.Log, lbclusters []lbcluster.LBCluster) {
 	hostname, e := os.Hostname()
 	if e == nil {
@@ -221,9 +150,9 @@ func checkAliases(config *lbconfig.Config, lg lbcluster.Log, lbclusters []lbclus
 	/* First, let's identify the hosts that have to be checked */
 	for i := range lbclusters {
 		pc := &lbclusters[i]
-		pc.Write_to_log("DEBUG", "DO WE HAVE TO UPDATE?")
+		pc.WriteToLog("DEBUG", "DO WE HAVE TO UPDATE?")
 		if pc.Time_to_refresh() {
-			pc.Write_to_log("INFO", "Time to refresh the cluster")
+			pc.WriteToLog("INFO", "Time to refresh the cluster")
 			pc.Get_list_hosts(hostsToCheck)
 			clustersToUpdate = append(clustersToUpdate, pc)
 		}
@@ -249,16 +178,16 @@ func checkAliases(config *lbconfig.Config, lg lbcluster.Log, lbclusters []lbclus
 
 		/* Finally, let's go through the aliases, selecting the best hosts*/
 		for _, pc := range clustersToUpdate {
-			pc.Write_to_log("DEBUG", "READY TO UPDATE THE CLUSTER")
+			pc.WriteToLog("DEBUG", "READY TO UPDATE THE CLUSTER")
 			if pc.FindBestHosts(hostsToCheck) {
 				if updateDNS {
-					pc.Write_to_log("DEBUG", "Should update dns is true")
+					pc.WriteToLog("DEBUG", "Should update dns is true")
 					pc.RefreshDNS(config.DNSManager, config.TsigKeyPrefix, config.TsigInternalKey, config.TsigExternalKey)
 				} else {
-					pc.Write_to_log("DEBUG", "should_update_dns false")
+					pc.WriteToLog("DEBUG", "should_update_dns false")
 				}
 			} else {
-				pc.Write_to_log("DEBUG", "FindBestHosts false")
+				pc.WriteToLog("DEBUG", "FindBestHosts false")
 			}
 		}
 	}
