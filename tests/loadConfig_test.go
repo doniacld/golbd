@@ -39,11 +39,11 @@ func TestLoadConfig(t *testing.T) {
 				"ermis.test.cern.ch":  {"ermis23.cern.ch", "ermis24.cern.ch"},
 				"ermis2.test.cern.ch": {"ermis23.toto.cern.ch", "ermis24.cern.ch", "ermis25.sub.cern.ch"}},
 			Parameters: map[string]lbcluster.Params{
-				"aiermis.cern.ch":     {Behaviour: "mindless", Best_hosts: 1, External: false, Metric: "cmsfrontier", Polling_interval: 300, Statistics: "long", Ttl: 60},
-				"uermis.cern.ch":      {Behaviour: "mindless", Best_hosts: 1, External: false, Metric: "cmsfrontier", Polling_interval: 300, Statistics: "long", Ttl: 222},
-				"permis.cern.ch":      {Behaviour: "mindless", Best_hosts: 1, External: false, Metric: "cmsfrontier", Polling_interval: 300, Statistics: "long", Ttl: 222},
-				"ermis.test.cern.ch":  {Behaviour: "mindless", Best_hosts: 1, External: false, Metric: "cmsfrontier", Polling_interval: 300, Statistics: "long", Ttl: 222},
-				"ermis2.test.cern.ch": {Behaviour: "mindless", Best_hosts: 1, External: false, Metric: "cmsfrontier", Polling_interval: 300, Statistics: "long", Ttl: 222}}}
+				"aiermis.cern.ch":     {Behaviour: "mindless", BestHosts: 1, External: false, Metric: "cmsfrontier", PollingInterval: 300, Statistics: "long", Ttl: 60},
+				"uermis.cern.ch":      {Behaviour: "mindless", BestHosts: 1, External: false, Metric: "cmsfrontier", PollingInterval: 300, Statistics: "long", Ttl: 222},
+				"permis.cern.ch":      {Behaviour: "mindless", BestHosts: 1, External: false, Metric: "cmsfrontier", PollingInterval: 300, Statistics: "long", Ttl: 222},
+				"ermis.test.cern.ch":  {Behaviour: "mindless", BestHosts: 1, External: false, Metric: "cmsfrontier", PollingInterval: 300, Statistics: "long", Ttl: 222},
+				"ermis2.test.cern.ch": {Behaviour: "mindless", BestHosts: 1, External: false, Metric: "cmsfrontier", PollingInterval: 300, Statistics: "long", Ttl: 222}}}
 
 	//retrieving the actual output
 	configExisting, _, e := lbconfig.LoadConfig(loadconfig.Name(), &lg)

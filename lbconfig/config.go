@@ -56,16 +56,16 @@ func LoadClusters(config *Config, lg *lbcluster.Log) ([]lbcluster.LBCluster, err
 			continue
 		}
 		if par, ok := config.Parameters[k]; ok {
-			lbc = lbcluster.LBCluster{Cluster_name: k, Loadbalancing_username: "loadbalancing",
-				Loadbalancing_password: config.SnmpPassword, Parameters: par,
-				Current_best_ips:      []net.IP{},
-				Previous_best_ips_dns: []net.IP{},
-				Slog:                  lg}
+			lbc = lbcluster.LBCluster{ClusterName: k, LoadBalancingUsername: "loadbalancing",
+				LoadBalancingPassword: config.SnmpPassword, Parameters: par,
+				CurrentBestIps:     []net.IP{},
+				PreviousBestIpsDns: []net.IP{},
+				Slog:               lg}
 			hm := make(map[string]lbcluster.Node)
 			for _, h := range v {
 				hm[h] = lbcluster.Node{Load: 100000, IPs: []net.IP{}}
 			}
-			lbc.Host_metric_table = hm
+			lbc.HostMetricTable = hm
 			lbcs = append(lbcs, lbc)
 			lbc.WriteToLog("INFO", "(re-)loaded cluster ")
 

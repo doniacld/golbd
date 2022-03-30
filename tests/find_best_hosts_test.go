@@ -31,14 +31,14 @@ func TestFindBestHosts(t *testing.T) {
 	if !c.FindBestHosts(hosts_to_check) {
 		t.Errorf("e.Find_best_hosts: returned false, expected true")
 	}
-	if !reflect.DeepEqual(c.Host_metric_table, expected_host_metric_table) {
-		t.Errorf("e.Find_best_hosts: c.Host_metric_table: got\n%v\nexpected\n%v", c.Host_metric_table, expected_host_metric_table)
+	if !reflect.DeepEqual(c.HostMetricTable, expected_host_metric_table) {
+		t.Errorf("e.Find_best_hosts: c.Host_metric_table: got\n%v\nexpected\n%v", c.HostMetricTable, expected_host_metric_table)
 	}
-	if !reflect.DeepEqual(c.Current_best_ips, expected_current_best_ips) {
-		t.Errorf("e.Find_best_hosts: c.Current_best_hosts: got\n%v\nexpected\n%v", c.Current_best_ips, expected_current_best_ips)
+	if !reflect.DeepEqual(c.CurrentBestIps, expected_current_best_ips) {
+		t.Errorf("e.Find_best_hosts: c.Current_best_hosts: got\n%v\nexpected\n%v", c.CurrentBestIps, expected_current_best_ips)
 	}
-	if c.Time_of_last_evaluation.Add(time.Duration(2) * time.Second).Before(time.Now()) {
-		t.Errorf("e.Find_best_hosts: c.Time_of_last_evaluation: got\n%v\ncurrent time\n%v", c.Time_of_last_evaluation, time.Now())
+	if c.TimeOfLastEvaluation.Add(time.Duration(2) * time.Second).Before(time.Now()) {
+		t.Errorf("e.Find_best_hosts: c.Time_of_last_evaluation: got\n%v\ncurrent time\n%v", c.TimeOfLastEvaluation, time.Now())
 	}
 }
 
@@ -52,16 +52,16 @@ func TestFindBestHostsNoValidHostCmsfrontier(t *testing.T) {
 
 	expected_current_best_ips := []net.IP{}
 
-	expected_time_of_last_evaluation := c.Time_of_last_evaluation
+	expected_time_of_last_evaluation := c.TimeOfLastEvaluation
 
 	if c.FindBestHosts(bad_hosts_to_check) {
 		t.Errorf("e.Find_best_hosts: returned true, expected false")
 	}
-	if !reflect.DeepEqual(c.Current_best_ips, expected_current_best_ips) {
-		t.Errorf("e.Find_best_hosts: c.Current_best_hosts: got\n%v\nexpected\n%v", c.Current_best_ips, expected_current_best_ips)
+	if !reflect.DeepEqual(c.CurrentBestIps, expected_current_best_ips) {
+		t.Errorf("e.Find_best_hosts: c.Current_best_hosts: got\n%v\nexpected\n%v", c.CurrentBestIps, expected_current_best_ips)
 	}
-	if c.Time_of_last_evaluation.Add(time.Duration(2) * time.Second).Before(expected_time_of_last_evaluation) {
-		t.Errorf("e.Find_best_hosts: c.Time_of_last_evaluation: got\n%v\nexpected time\n%v", c.Time_of_last_evaluation, expected_time_of_last_evaluation)
+	if c.TimeOfLastEvaluation.Add(time.Duration(2) * time.Second).Before(expected_time_of_last_evaluation) {
+		t.Errorf("e.Find_best_hosts: c.Time_of_last_evaluation: got\n%v\nexpected time\n%v", c.TimeOfLastEvaluation, expected_time_of_last_evaluation)
 	}
 }
 
@@ -78,11 +78,11 @@ func TestFindBestHostsNoValidHostMinino(t *testing.T) {
 	if !c.FindBestHosts(bad_hosts_to_check) {
 		t.Errorf("e.Find_best_hosts: returned false, expected true")
 	}
-	if !reflect.DeepEqual(c.Current_best_ips, expected_current_best_ips) {
-		t.Errorf("e.Find_best_hosts: c.Current_best_hosts: got\n%v\nexpected\n%v", c.Current_best_ips, expected_current_best_ips)
+	if !reflect.DeepEqual(c.CurrentBestIps, expected_current_best_ips) {
+		t.Errorf("e.Find_best_hosts: c.Current_best_hosts: got\n%v\nexpected\n%v", c.CurrentBestIps, expected_current_best_ips)
 	}
-	if c.Time_of_last_evaluation.Add(time.Duration(2) * time.Second).Before(time.Now()) {
-		t.Errorf("e.Find_best_hosts: c.Time_of_last_evaluation: got\n%v\ncurrent time\n%v", c.Time_of_last_evaluation, time.Now())
+	if c.TimeOfLastEvaluation.Add(time.Duration(2) * time.Second).Before(time.Now()) {
+		t.Errorf("e.Find_best_hosts: c.Time_of_last_evaluation: got\n%v\ncurrent time\n%v", c.TimeOfLastEvaluation, time.Now())
 	}
 }
 
@@ -99,10 +99,10 @@ func TestFindBestHostsNoValidHostMinimum(t *testing.T) {
 	if !c.FindBestHosts(bad_hosts_to_check) {
 		t.Errorf("e.Find_best_hosts: returned false, expected true")
 	}
-	if reflect.DeepEqual(c.Current_best_ips, not_expected_current_best_ips) {
-		t.Errorf("e.Find_best_hosts: c.Current_best_hosts: got\n%v\nwhich is not expected", c.Current_best_ips)
+	if reflect.DeepEqual(c.CurrentBestIps, not_expected_current_best_ips) {
+		t.Errorf("e.Find_best_hosts: c.Current_best_hosts: got\n%v\nwhich is not expected", c.CurrentBestIps)
 	}
-	if c.Time_of_last_evaluation.Add(time.Duration(2) * time.Second).Before(time.Now()) {
-		t.Errorf("e.Find_best_hosts: c.Time_of_last_evaluation: got\n%v\ncurrent time\n%v", c.Time_of_last_evaluation, time.Now())
+	if c.TimeOfLastEvaluation.Add(time.Duration(2) * time.Second).Before(time.Now()) {
+		t.Errorf("e.Find_best_hosts: c.Time_of_last_evaluation: got\n%v\ncurrent time\n%v", c.TimeOfLastEvaluation, time.Now())
 	}
 }

@@ -151,9 +151,9 @@ func checkAliases(config *lbconfig.Config, lg lbcluster.Log, lbclusters []lbclus
 	for i := range lbclusters {
 		pc := &lbclusters[i]
 		pc.WriteToLog("DEBUG", "DO WE HAVE TO UPDATE?")
-		if pc.Time_to_refresh() {
+		if pc.TimeToRefresh() {
 			pc.WriteToLog("INFO", "Time to refresh the cluster")
-			pc.Get_list_hosts(hostsToCheck)
+			pc.GetListHosts(hostsToCheck)
 			clustersToUpdate = append(clustersToUpdate, pc)
 		}
 	}

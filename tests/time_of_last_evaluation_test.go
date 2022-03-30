@@ -9,12 +9,12 @@ func TestTimeOfLastEvaluation(t *testing.T) {
 
 	c := getTestCluster("test01.cern.ch")
 
-	c.Time_of_last_evaluation = time.Now().Add(time.Duration(-c.Parameters.Polling_interval+2) * time.Second)
-	if c.Time_to_refresh() {
+	c.TimeOfLastEvaluation = time.Now().Add(time.Duration(-c.Parameters.PollingInterval+2) * time.Second)
+	if c.TimeToRefresh() {
 		t.Errorf("e.Time_of_last_evaluation: got\n%v\nexpected\n%v", true, false)
 	}
-	c.Time_of_last_evaluation = time.Now().Add(time.Duration(-c.Parameters.Polling_interval-2) * time.Second)
-	if !c.Time_to_refresh() {
+	c.TimeOfLastEvaluation = time.Now().Add(time.Duration(-c.Parameters.PollingInterval-2) * time.Second)
+	if !c.TimeToRefresh() {
 		t.Errorf("e.Time_of_last_evaluation: got\n%v\nexpected\n%v", false, true)
 	}
 }

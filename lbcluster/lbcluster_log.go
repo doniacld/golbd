@@ -35,7 +35,7 @@ type Logger interface {
 
 // WriteToLog puts something in the log file
 func (lbc *LBCluster) WriteToLog(level string, input string) error {
-	msg := fmt.Sprintf("cluster: %s, %s", lbc.Cluster_name, input)
+	msg := fmt.Sprintf("cluster: %s, %s", lbc.ClusterName, input)
 
 	switch level {
 	case levelInfo:

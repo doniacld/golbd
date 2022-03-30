@@ -32,18 +32,18 @@ func TestGetStateDNS(t *testing.T) {
 	iprecString := []string{}
 	for _, c := range Clusters {
 		err := c.GetStateDNS(dnsManager)
-		iprec := c.Previous_best_ips_dns
+		iprec := c.PreviousBestIpsDns
 		for _, ip := range iprec {
 			iprecString = append(iprecString, ip.String())
 		}
 		//Casting to string. The DeepEqual of  IP is a bit  tricky, since it can
-		received[c.Cluster_name] = []interface{}{iprecString, err}
+		received[c.ClusterName] = []interface{}{iprecString, err}
 	}
 	//DeepEqual comparison between the map with expected values and the one with the outputs
 	for _, c := range Clusters {
-		if !reflect.DeepEqual(received[c.Cluster_name], expected[c.Cluster_name]) {
-			t.Errorf("\ngot ips\n%T type and value %v\nexpected\n%T type and value %v", received[c.Cluster_name][0], received[c.Cluster_name][0], expected[c.Cluster_name][0], expected[c.Cluster_name][0])
-			t.Errorf("\ngot error\n%T type and value %v\nexpected\n%T type and value %v", received[c.Cluster_name][1], received[c.Cluster_name][1], expected[c.Cluster_name][1], expected[c.Cluster_name][1])
+		if !reflect.DeepEqual(received[c.ClusterName], expected[c.ClusterName]) {
+			t.Errorf("\ngot ips\n%T type and value %v\nexpected\n%T type and value %v", received[c.ClusterName][0], received[c.ClusterName][0], expected[c.ClusterName][0], expected[c.ClusterName][0])
+			t.Errorf("\ngot error\n%T type and value %v\nexpected\n%T type and value %v", received[c.ClusterName][1], received[c.ClusterName][1], expected[c.ClusterName][1], expected[c.ClusterName][1])
 		}
 	}
 
