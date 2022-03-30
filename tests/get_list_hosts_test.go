@@ -5,8 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.cern.ch/lb-experts/golbd/lbcluster"
-	"gitlab.cern.ch/lb-experts/golbd/lbhost"
+	"lb-experts/golbd/lbcluster"
+	"lb-experts/golbd/lbhost"
+	"lb-experts/golbd/log"
 )
 
 func TestGetListHostsOne(t *testing.T) {
@@ -58,7 +59,7 @@ func TestGetListHostsOne(t *testing.T) {
 }
 
 func TestGetListHostsTwo(t *testing.T) {
-	lg := lbcluster.Log{Stdout: true, DebugFlag: false}
+	lg := log.Log{Stdout: true, DebugFlag: false}
 
 	clusters := []lbcluster.LBCluster{
 		{ClusterName: "test01.cern.ch",

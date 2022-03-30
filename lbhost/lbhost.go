@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/reguero/go-snmplib"
+	"lb-experts/golbd/log"
 )
 
 const (
@@ -47,7 +48,7 @@ func (h *LBHost) SnmpReq() {
 		transport := myTransport.Transport
 		nodeIp := myTransport.IP.String()
 		/* There is no need to put square brackets around the ipv6 addresses*/
-		h.Log("DEBUG", "Checking the host "+nodeIp+" with "+transport)
+		h.Log(log.LevelDebug, "Checking the host "+nodeIp+" with "+transport)
 		snmp, err := snmplib.NewSNMPv3(nodeIp, h.LoadBalancingUsername, "MD5", h.LoadBalancingPassword, "NOPRIV", h.LoadBalancingPassword,
 			time.Duration(TIMEOUT)*time.Second, 2)
 		if err != nil {
@@ -77,7 +78,7 @@ func (h *LBHost) SnmpReq() {
 
 					} else {
 
-						h.Log("INFO", fmt.Sprintf("contacted node: transport: %v ip: %v - reply was %v", transport, nodeIp, pdu))
+						h.Log(log.LevelInfo, fmt.Sprintf("contacted node: transport: %v ip: %v - reply was %v", transport, nodeIp, pdu))
 
 						//var pduInteger int
 						switch t := pdu.(type) {
@@ -96,16 +97,16 @@ func (h *LBHost) SnmpReq() {
 
 	}
 
-	h.Log("DEBUG", "All the ips have been tested")
+	h.Log(log.LevelDebug, "All the ips have been tested")
 	// TODO is it for debugging?
 	/*for _, my_transport := range self.Host_transports {
-		self.Write_to_log("INFO", fmt.Sprintf("%v", my_transport))
+		self.Write_to_log(lbcluster.LevelInfo, fmt.Sprintf("%v", my_transport))
 	}*/
 }
 
 func (h *LBHost) Log(level string, msg string) error {
 	var err error
-	if level == "DEBUG" && !h.DebugFlag {
+	if level == log.LevelDebug && !h.DebugFlag {
 		//The debug messages should not appear
 		return nil
 	}
@@ -145,10 +146,10 @@ func (h *LBHost) GetLoadForAlias(clusterName string) int {
 		if (pduInteger > 0 && pduInteger < load) || (load < 0) {
 			load = pduInteger
 		}
-		h.Log("DEBUG", fmt.Sprintf("Possible load is %v", pduInteger))
+		h.Log(log.LevelDebug, fmt.Sprintf("Possible load is %v", pduInteger))
 
 	}
-	h.Log("DEBUG", fmt.Sprintf("THE LOAD IS %v, ", load))
+	h.Log(log.LevelDebug, fmt.Sprintf("THE LOAD IS %v, ", load))
 
 	return load
 }
@@ -161,7 +162,7 @@ func (h *LBHost) GetWorkingIps() ([]net.IP, error) {
 		}
 
 	}
-	h.Log("INFO", fmt.Sprintf("The ips for this host are %v", myIps))
+	h.Log(log.LevelInfo, fmt.Sprintf("The ips for this host are %v", myIps))
 	return myIps, nil
 }
 
@@ -170,7 +171,7 @@ func (h *LBHost) GetAllIps() ([]net.IP, error) {
 	for _, myTransport := range h.HostTransports {
 		myIps = append(myIps, myTransport.IP)
 	}
-	h.Log("INFO", fmt.Sprintf("All ips for this host are %v", myIps))
+	h.Log(log.LevelInfo, fmt.Sprintf("All ips for this host are %v", myIps))
 	return myIps, nil
 }
 
@@ -183,30 +184,30 @@ func (h *LBHost) GetIps() ([]net.IP, error) {
 	net.DefaultResolver.StrictErrors = true
 
 	for i := 0; i < 3; i++ {
-		h.Log("INFO", "Getting the ip addresses")
+		h.Log(log.LevelInfo, "Getting the ip addresses")
 		ips, err = net.LookupIP(h.HostName)
 		if err == nil {
 			return ips, nil
 		}
-		h.Log("WARNING", fmt.Sprintf("LookupIP: %v has incorrect or missing IP address (%v) ", h.HostName, err))
+		h.Log(log.LevelWarning, fmt.Sprintf("LookupIP: %v has incorrect or missing IP address (%v) ", h.HostName, err))
 		submatch := re.FindStringSubmatch(err.Error())
 		if submatch != nil {
-			h.Log("INFO", "There is no need to retry this error")
+			h.Log(log.LevelInfo, "There is no need to retry this error")
 			return nil, err
 		}
 	}
 
-	h.Log("ERROR", "After several retries, we couldn't get the ips!. Let's try with partial results")
+	h.Log(log.LevelError, "After several retries, we couldn't get the ips!. Let's try with partial results")
 	net.DefaultResolver.StrictErrors = false
 	ips, err = net.LookupIP(h.HostName)
 	if err != nil {
-		h.Log("ERROR", fmt.Sprintf("It didn't work :(. This node will be ignored during this evaluation: %v", err))
+		h.Log(log.LevelError, fmt.Sprintf("It didn't work :(. This node will be ignored during this evaluation: %v", err))
 	}
 	return ips, err
 }
 
 func (h *LBHost) findTransports() {
-	h.Log("DEBUG", "Let's find the ips behind this host")
+	h.Log(log.LevelDebug, "Let's find the ips behind this host")
 
 	ips, _ := h.GetIps()
 	for _, ip := range ips {

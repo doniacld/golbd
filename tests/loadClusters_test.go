@@ -5,13 +5,14 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.cern.ch/lb-experts/golbd/lbcluster"
-	"gitlab.cern.ch/lb-experts/golbd/lbconfig"
-	"gitlab.cern.ch/lb-experts/golbd/lbhost"
+	"lb-experts/golbd/lbcluster"
+	"lb-experts/golbd/lbconfig"
+	"lb-experts/golbd/lbhost"
+	"lb-experts/golbd/log"
 )
 
 func getTestCluster(name string) lbcluster.LBCluster {
-	lg := lbcluster.Log{SyslogWriter: nil, Stdout: true, DebugFlag: false}
+	lg := log.Log{SyslogWriter: nil, Stdout: true, DebugFlag: false}
 	return lbcluster.LBCluster{ClusterName: name,
 		LoadBalancingUsername: "loadbalancing",
 		LoadBalancingPassword: "zzz123",
@@ -30,7 +31,7 @@ func getTestCluster(name string) lbcluster.LBCluster {
 }
 
 func getSecondTestCluster() lbcluster.LBCluster {
-	lg := lbcluster.Log{SyslogWriter: nil, Stdout: true, DebugFlag: false}
+	lg := log.Log{SyslogWriter: nil, Stdout: true, DebugFlag: false}
 	return lbcluster.LBCluster{ClusterName: "test02.test.cern.ch",
 		LoadBalancingUsername: "loadbalancing",
 		LoadBalancingPassword: "zzz123",
@@ -152,7 +153,7 @@ func getBadHostsToCheck(c lbcluster.LBCluster) map[string]lbhost.LBHost {
 }
 
 func TestLoadClusters(t *testing.T) {
-	lg := lbcluster.Log{SyslogWriter: nil, Stdout: true, DebugFlag: false}
+	lg := log.Log{SyslogWriter: nil, Stdout: true, DebugFlag: false}
 
 	config := lbconfig.Config{Master: "lbdxyz.cern.ch",
 		HeartbeatFile: "heartbeat",

@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"gitlab.cern.ch/lb-experts/golbd/lbcluster"
+	"lb-experts/golbd/lbcluster"
 )
 
 func getExpectedHostMetric() map[string]lbcluster.Node {

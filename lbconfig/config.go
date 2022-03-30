@@ -11,7 +11,8 @@ import (
 	"strings"
 	"sync"
 
-	"gitlab.cern.ch/lb-experts/golbd/lbcluster"
+	"lb-experts/golbd/lbcluster"
+	"lb-experts/golbd/log"
 )
 
 // Config this is the configuration of the lbd
@@ -46,7 +47,7 @@ func readLines(path string) (lines []string, err error) {
 }
 
 //LoadClusters checks the syntax of the clusters defined in the configuration file
-func LoadClusters(config *Config, lg *lbcluster.Log) ([]lbcluster.LBCluster, error) {
+func LoadClusters(config *Config, lg *log.Log) ([]lbcluster.LBCluster, error) {
 	var lbc lbcluster.LBCluster
 	var lbcs []lbcluster.LBCluster
 
@@ -79,7 +80,7 @@ func LoadClusters(config *Config, lg *lbcluster.Log) ([]lbcluster.LBCluster, err
 }
 
 //LoadConfig reads a configuration file and returns a struct with the config
-func LoadConfig(configFile string, lg *lbcluster.Log) (*Config, []lbcluster.LBCluster, error) {
+func LoadConfig(configFile string, lg *log.Log) (*Config, []lbcluster.LBCluster, error) {
 	var (
 		config Config
 		p      lbcluster.Params

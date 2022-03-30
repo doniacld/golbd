@@ -1,4 +1,4 @@
-package lbcluster
+package log
 
 import (
 	"fmt"
@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	levelInfo    = "INFO"
-	levelDebug   = "DEBUG"
-	levelWarning = "WARNING"
-	levelError   = "ERROR"
+	LevelInfo    = "INFO"
+	LevelDebug   = "DEBUG"
+	LevelWarning = "WARNING"
+	LevelError   = "ERROR"
 )
 
 // Log struct for the log
@@ -23,32 +23,6 @@ type Log struct {
 	DebugFlag    bool
 	ToFilePath   string
 	logMu        sync.Mutex
-}
-
-// Logger struct for the Logger interface
-type Logger interface {
-	Info(s string) error
-	Warning(s string) error
-	Debug(s string) error
-	Error(s string) error
-}
-
-// WriteToLog puts something in the log file
-func (lbc *LBCluster) WriteToLog(level string, input string) error {
-	msg := fmt.Sprintf("cluster: %s, %s", lbc.ClusterName, input)
-
-	switch level {
-	case levelInfo:
-		return lbc.Slog.Info(msg)
-	case levelDebug:
-		return lbc.Slog.Debug(msg)
-	case levelWarning:
-		return lbc.Slog.Warning(msg)
-	case levelError:
-		return lbc.Slog.Error(msg)
-	default:
-		return lbc.Slog.Error(fmt.Sprintf("unsupported level %s, assuming error %s", input, msg))
-	}
 }
 
 // Info writes as Info

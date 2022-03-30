@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.cern.ch/lb-experts/golbd/lbcluster"
+	"lb-experts/golbd/lbcluster"
 )
 
 func compareIPs(t *testing.T, source, target []net.IP) {

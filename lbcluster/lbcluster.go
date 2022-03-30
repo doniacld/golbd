@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"lb-experts/golbd/log"
 	"math/rand"
 	"net"
 	"net/http"
@@ -11,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"gitlab.cern.ch/lb-experts/golbd/lbhost"
+	"lb-experts/golbd/lbhost"
 )
 
 // WorstValue worst possible load
@@ -34,7 +35,7 @@ type LBCluster struct {
 	CurrentBestIps        []net.IP
 	PreviousBestIpsDns    []net.IP
 	CurrentIndex          int
-	Slog                  *Log
+	Slog                  *log.Log
 }
 
 // Params of the alias
@@ -93,7 +94,7 @@ func (lbc *LBCluster) TimeToRefresh() bool {
 
 // GetListHosts Get the hosts for an alias
 func (lbc *LBCluster) GetListHosts(current_list map[string]lbhost.LBHost) {
-	lbc.WriteToLog("DEBUG", "Getting the list of hosts for the alias")
+	lbc.WriteToLog(log.LevelDebug, "Getting the list of hosts for the alias")
 	for host := range lbc.HostMetricTable {
 		myHost, ok := current_list[host]
 		if ok {
@@ -142,7 +143,7 @@ func (lbc *LBCluster) FindBestHosts(hostsToCheck map[string]lbhost.LBHost) bool 
 
 	_, ok := allMetrics[lbc.Parameters.Metric]
 	if !ok {
-		lbc.WriteToLog("ERROR", "wrong parameter(metric) in definition of cluster "+lbc.Parameters.Metric)
+		lbc.WriteToLog(log.LevelError, "wrong parameter(metric) in definition of cluster "+lbc.Parameters.Metric)
 		return false
 	}
 	lbc.TimeOfLastEvaluation = time.Now()
@@ -153,13 +154,13 @@ func (lbc *LBCluster) FindBestHosts(hostsToCheck map[string]lbhost.LBHost) bool 
 	if len(lbc.CurrentBestIps) == 0 {
 		nodes = "NONE"
 	}
-	lbc.WriteToLog("INFO", "best hosts are: "+nodes)
+	lbc.WriteToLog(log.LevelInfo, "best hosts are: "+nodes)
 	return true
 }
 
 // ApplyMetric This is the core of the lbcluster: based on the metrics, select the best hosts
 func (lbc *LBCluster) ApplyMetric(hostsToCheck map[string]lbhost.LBHost) bool {
-	lbc.WriteToLog("INFO", "Got metric = "+lbc.Parameters.Metric)
+	lbc.WriteToLog(log.LevelInfo, "Got metric = "+lbc.Parameters.Metric)
 	pl := make(NodeList, len(lbc.HostMetricTable))
 	i := 0
 	for _, v := range lbc.HostMetricTable {
@@ -169,7 +170,7 @@ func (lbc *LBCluster) ApplyMetric(hostsToCheck map[string]lbhost.LBHost) bool {
 	//Let's shuffle the hosts before sorting them, in case some hosts have the same value
 	Shuffle(len(pl), func(i, j int) { pl[i], pl[j] = pl[j], pl[i] })
 	sort.Sort(pl)
-	lbc.WriteToLog("DEBUG", fmt.Sprintf("%v", pl))
+	lbc.WriteToLog(log.LevelDebug, fmt.Sprintf("%v", pl))
 	var sortedHostList []Node
 	var usefulHostList []Node
 	for _, v := range pl {
@@ -178,7 +179,7 @@ func (lbc *LBCluster) ApplyMetric(hostsToCheck map[string]lbhost.LBHost) bool {
 		}
 		sortedHostList = append(sortedHostList, v)
 	}
-	lbc.WriteToLog("DEBUG", fmt.Sprintf("%v", usefulHostList))
+	lbc.WriteToLog(log.LevelDebug, fmt.Sprintf("%v", usefulHostList))
 	usefulHosts := len(usefulHostList)
 	listLength := len(pl)
 	max := lbc.Parameters.BestHosts
@@ -186,17 +187,17 @@ func (lbc *LBCluster) ApplyMetric(hostsToCheck map[string]lbhost.LBHost) bool {
 		max = listLength
 	}
 	if max > listLength {
-		lbc.WriteToLog("WARNING", fmt.Sprintf("impossible to return %v hosts from the list of %v hosts (%v). Check the configuration of cluster. Returning %v hosts.",
+		lbc.WriteToLog(log.LevelWarning, fmt.Sprintf("impossible to return %v hosts from the list of %v hosts (%v). Check the configuration of cluster. Returning %v hosts.",
 			max, listLength, lbc.concatenateNodes(sortedHostList), listLength))
 		max = listLength
 	}
 	lbc.CurrentBestIps = []net.IP{}
 	if listLength == 0 {
-		lbc.WriteToLog("ERROR", "cluster has no hosts defined ! Check the configuration.")
+		lbc.WriteToLog(log.LevelError, "cluster has no hosts defined ! Check the configuration.")
 	} else if usefulHosts == 0 {
 
 		if lbc.Parameters.Metric == "minimum" {
-			lbc.WriteToLog("WARNING", fmt.Sprintf("no usable hosts found for cluster! Returning random %v hosts.", max))
+			lbc.WriteToLog(log.LevelWarning, fmt.Sprintf("no usable hosts found for cluster! Returning random %v hosts.", max))
 			//Get hosts with all IPs even when not OK for SNMP
 			lbc.ReEvaluateHostsForMinimum(hostsToCheck)
 			i := 0
@@ -209,17 +210,17 @@ func (lbc *LBCluster) ApplyMetric(hostsToCheck map[string]lbhost.LBHost) bool {
 			for i := 0; i < max; i++ {
 				lbc.CurrentBestIps = append(lbc.CurrentBestIps, pl[i].IPs...)
 			}
-			lbc.WriteToLog("WARNING", fmt.Sprintf("We have put random hosts behind the alias: %v", lbc.CurrentBestIps))
+			lbc.WriteToLog(log.LevelWarning, fmt.Sprintf("We have put random hosts behind the alias: %v", lbc.CurrentBestIps))
 
 		} else if (lbc.Parameters.Metric == "minino") || (lbc.Parameters.Metric == "cmsweb") {
-			lbc.WriteToLog("WARNING", "no usable hosts found for cluster! Returning no hosts.")
+			lbc.WriteToLog(log.LevelWarning, "no usable hosts found for cluster! Returning no hosts.")
 		} else if lbc.Parameters.Metric == "cmsfrontier" {
-			lbc.WriteToLog("WARNING", "no usable hosts found for cluster! Skipping the DNS update")
+			lbc.WriteToLog(log.LevelWarning, "no usable hosts found for cluster! Skipping the DNS update")
 			return false
 		}
 	} else {
 		if usefulHosts < max {
-			lbc.WriteToLog("WARNING", fmt.Sprintf("only %v useable hosts found in cluster", usefulHosts))
+			lbc.WriteToLog(log.LevelWarning, fmt.Sprintf("only %v useable hosts found in cluster", usefulHosts))
 			max = usefulHosts
 		}
 		for i := 0; i < max; i++ {
@@ -294,7 +295,7 @@ func (lbc *LBCluster) EvaluateHosts(hostsToCheck map[string]lbhost.LBHost) {
 			ips, err = host.GetIps()
 		}
 		lbc.HostMetricTable[currenthost] = Node{host.GetLoadForAlias(lbc.ClusterName), ips}
-		lbc.WriteToLog("DEBUG", fmt.Sprintf("node: %s It has a load of %d", currenthost, lbc.HostMetricTable[currenthost].Load))
+		lbc.WriteToLog(log.LevelDebug, fmt.Sprintf("node: %s It has a load of %d", currenthost, lbc.HostMetricTable[currenthost].Load))
 	}
 }
 
@@ -307,6 +308,6 @@ func (lbc *LBCluster) ReEvaluateHostsForMinimum(hostsToCheck map[string]lbhost.L
 			ips, err = host.GetIps()
 		}
 		lbc.HostMetricTable[currenthost] = Node{host.GetLoadForAlias(lbc.ClusterName), ips}
-		lbc.WriteToLog("DEBUG", fmt.Sprintf("node: %s It has a load of %d", currenthost, lbc.HostMetricTable[currenthost].Load))
+		lbc.WriteToLog(log.LevelDebug, fmt.Sprintf("node: %s It has a load of %d", currenthost, lbc.HostMetricTable[currenthost].Load))
 	}
 }
