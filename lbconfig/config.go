@@ -67,7 +67,7 @@ func LoadClusters(config *Config, lg *lbcluster.Log) ([]lbcluster.LBCluster, err
 			}
 			lbc.Host_metric_table = hm
 			lbcs = append(lbcs, lbc)
-			lbc.Write_to_log("INFO", "(re-)loaded cluster ")
+			lbc.WriteToLog("INFO", "(re-)loaded cluster ")
 
 		} else {
 			lg.Warning("cluster: " + k + " missing parameters for cluster; ignoring the cluster, please check the configuration file " + config.ConfigFile)

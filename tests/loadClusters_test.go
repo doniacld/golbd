@@ -11,7 +11,7 @@ import (
 )
 
 func getTestCluster(name string) lbcluster.LBCluster {
-	lg := lbcluster.Log{SyslogWriter: nil, Stdout: true, Debugflag: false}
+	lg := lbcluster.Log{SyslogWriter: nil, Stdout: true, DebugFlag: false}
 	return lbcluster.LBCluster{Cluster_name: name,
 		Loadbalancing_username: "loadbalancing",
 		Loadbalancing_password: "zzz123",
@@ -30,7 +30,7 @@ func getTestCluster(name string) lbcluster.LBCluster {
 }
 
 func getSecondTestCluster() lbcluster.LBCluster {
-	lg := lbcluster.Log{SyslogWriter: nil, Stdout: true, Debugflag: false}
+	lg := lbcluster.Log{SyslogWriter: nil, Stdout: true, DebugFlag: false}
 	return lbcluster.LBCluster{Cluster_name: "test02.test.cern.ch",
 		Loadbalancing_username: "loadbalancing",
 		Loadbalancing_password: "zzz123",
@@ -56,8 +56,8 @@ func getHostsToCheck(c lbcluster.LBCluster) map[string]lbhost.LBHost {
 			},
 			LoadBalancingUsername: c.Loadbalancing_username,
 			LoadBalancingPassword: c.Loadbalancing_password,
-			LogFile:               c.Slog.TofilePath,
-			DebugFlag:             c.Slog.Debugflag,
+			LogFile:               c.Slog.ToFilePath,
+			DebugFlag:             c.Slog.DebugFlag,
 		},
 		"lxplus041.cern.ch": lbhost.LBHost{ClusterName: c.Cluster_name,
 			HostName: "lxplus041.cern.ch",
@@ -67,32 +67,32 @@ func getHostsToCheck(c lbcluster.LBCluster) map[string]lbhost.LBHost {
 			},
 			LoadBalancingUsername: c.Loadbalancing_username,
 			LoadBalancingPassword: c.Loadbalancing_password,
-			LogFile:               c.Slog.TofilePath,
-			DebugFlag:             c.Slog.Debugflag,
+			LogFile:               c.Slog.ToFilePath,
+			DebugFlag:             c.Slog.DebugFlag,
 		},
 		"lxplus130.cern.ch": lbhost.LBHost{ClusterName: c.Cluster_name,
 			HostName:              "lxplus130.cern.ch",
 			HostTransports:        []lbhost.TransportResult{lbhost.TransportResult{Transport: "udp", ResponseInt: 27, ResponseString: "", IP: net.ParseIP("188.184.108.100"), ResponseError: ""}},
 			LoadBalancingUsername: c.Loadbalancing_username,
 			LoadBalancingPassword: c.Loadbalancing_password,
-			LogFile:               c.Slog.TofilePath,
-			DebugFlag:             c.Slog.Debugflag,
+			LogFile:               c.Slog.ToFilePath,
+			DebugFlag:             c.Slog.DebugFlag,
 		},
 		"lxplus133.subdo.cern.ch": lbhost.LBHost{ClusterName: c.Cluster_name,
 			HostName:              "lxplus130.subdo.cern.ch",
 			HostTransports:        []lbhost.TransportResult{lbhost.TransportResult{Transport: "udp", ResponseInt: 27, ResponseString: "", IP: net.ParseIP("188.184.108.101"), ResponseError: ""}},
 			LoadBalancingUsername: c.Loadbalancing_username,
 			LoadBalancingPassword: c.Loadbalancing_password,
-			LogFile:               c.Slog.TofilePath,
-			DebugFlag:             c.Slog.Debugflag,
+			LogFile:               c.Slog.ToFilePath,
+			DebugFlag:             c.Slog.DebugFlag,
 		},
 		"monit-kafkax-17be060b0d.cern.ch": lbhost.LBHost{ClusterName: c.Cluster_name,
 			HostName:              "monit-kafkax-17be060b0d.cern.ch",
 			HostTransports:        []lbhost.TransportResult{lbhost.TransportResult{Transport: "udp", ResponseInt: 100000, ResponseString: "monit-kafkax.cern.ch=816,monit-kafka.cern.ch=816,test01.cern.ch=816", IP: net.ParseIP("188.184.108.100"), ResponseError: ""}},
 			LoadBalancingUsername: c.Loadbalancing_username,
 			LoadBalancingPassword: c.Loadbalancing_password,
-			LogFile:               c.Slog.TofilePath,
-			DebugFlag:             c.Slog.Debugflag,
+			LogFile:               c.Slog.ToFilePath,
+			DebugFlag:             c.Slog.DebugFlag,
 		},
 	}
 
@@ -108,8 +108,8 @@ func getBadHostsToCheck(c lbcluster.LBCluster) map[string]lbhost.LBHost {
 			},
 			LoadBalancingUsername: c.Loadbalancing_username,
 			LoadBalancingPassword: c.Loadbalancing_password,
-			LogFile:               c.Slog.TofilePath,
-			DebugFlag:             c.Slog.Debugflag,
+			LogFile:               c.Slog.ToFilePath,
+			DebugFlag:             c.Slog.DebugFlag,
 		},
 		"lxplus041.cern.ch": lbhost.LBHost{ClusterName: c.Cluster_name,
 			HostName: "lxplus041.cern.ch",
@@ -119,32 +119,32 @@ func getBadHostsToCheck(c lbcluster.LBCluster) map[string]lbhost.LBHost {
 			},
 			LoadBalancingUsername: c.Loadbalancing_username,
 			LoadBalancingPassword: c.Loadbalancing_password,
-			LogFile:               c.Slog.TofilePath,
-			DebugFlag:             c.Slog.Debugflag,
+			LogFile:               c.Slog.ToFilePath,
+			DebugFlag:             c.Slog.DebugFlag,
 		},
 		"lxplus130.cern.ch": lbhost.LBHost{ClusterName: c.Cluster_name,
 			HostName:              "lxplus130.cern.ch",
 			HostTransports:        []lbhost.TransportResult{lbhost.TransportResult{Transport: "udp", ResponseInt: -27, ResponseString: "", IP: net.ParseIP("188.184.108.100"), ResponseError: ""}},
 			LoadBalancingUsername: c.Loadbalancing_username,
 			LoadBalancingPassword: c.Loadbalancing_password,
-			LogFile:               c.Slog.TofilePath,
-			DebugFlag:             c.Slog.Debugflag,
+			LogFile:               c.Slog.ToFilePath,
+			DebugFlag:             c.Slog.DebugFlag,
 		},
 		"lxplus133.subdo.cern.ch": lbhost.LBHost{ClusterName: c.Cluster_name,
 			HostName:              "lxplus133.subdo.cern.ch",
 			HostTransports:        []lbhost.TransportResult{lbhost.TransportResult{Transport: "udp", ResponseInt: -15, ResponseString: "", IP: net.ParseIP("188.184.108.101"), ResponseError: ""}},
 			LoadBalancingUsername: c.Loadbalancing_username,
 			LoadBalancingPassword: c.Loadbalancing_password,
-			LogFile:               c.Slog.TofilePath,
-			DebugFlag:             c.Slog.Debugflag,
+			LogFile:               c.Slog.ToFilePath,
+			DebugFlag:             c.Slog.DebugFlag,
 		},
 		"monit-kafkax-17be060b0d.cern.ch": lbhost.LBHost{ClusterName: c.Cluster_name,
 			HostName:              "monit-kafkax-17be060b0d.cern.ch",
 			HostTransports:        []lbhost.TransportResult{lbhost.TransportResult{Transport: "udp", ResponseInt: 100000, ResponseString: "monit-kafkax.cern.ch=816,monit-kafka.cern.ch=816,test01.cern.ch=816", IP: net.ParseIP("188.184.108.100"), ResponseError: ""}},
 			LoadBalancingUsername: c.Loadbalancing_username,
 			LoadBalancingPassword: c.Loadbalancing_password,
-			LogFile:               c.Slog.TofilePath,
-			DebugFlag:             c.Slog.Debugflag,
+			LogFile:               c.Slog.ToFilePath,
+			DebugFlag:             c.Slog.DebugFlag,
 		},
 	}
 
@@ -152,7 +152,7 @@ func getBadHostsToCheck(c lbcluster.LBCluster) map[string]lbhost.LBHost {
 }
 
 func TestLoadClusters(t *testing.T) {
-	lg := lbcluster.Log{SyslogWriter: nil, Stdout: true, Debugflag: false}
+	lg := lbcluster.Log{SyslogWriter: nil, Stdout: true, DebugFlag: false}
 
 	config := lbconfig.Config{Master: "lbdxyz.cern.ch",
 		HeartbeatFile: "heartbeat",

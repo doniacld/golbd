@@ -17,36 +17,36 @@ func TestGetListHostsOne(t *testing.T) {
 			HostName:              "lxplus041.cern.ch",
 			LoadBalancingUsername: c.Loadbalancing_username,
 			LoadBalancingPassword: c.Loadbalancing_password,
-			LogFile:               c.Slog.TofilePath,
-			DebugFlag:             c.Slog.Debugflag,
+			LogFile:               c.Slog.ToFilePath,
+			DebugFlag:             c.Slog.DebugFlag,
 		},
 		"monit-kafkax-17be060b0d.cern.ch": lbhost.LBHost{ClusterName: c.Cluster_name,
 			HostName:              "monit-kafkax-17be060b0d.cern.ch",
 			LoadBalancingUsername: c.Loadbalancing_username,
 			LoadBalancingPassword: c.Loadbalancing_password,
-			LogFile:               c.Slog.TofilePath,
-			DebugFlag:             c.Slog.Debugflag,
+			LogFile:               c.Slog.ToFilePath,
+			DebugFlag:             c.Slog.DebugFlag,
 		},
 		"lxplus132.cern.ch": lbhost.LBHost{ClusterName: c.Cluster_name,
 			HostName:              "lxplus132.cern.ch",
 			LoadBalancingUsername: c.Loadbalancing_username,
 			LoadBalancingPassword: c.Loadbalancing_password,
-			LogFile:               c.Slog.TofilePath,
-			DebugFlag:             c.Slog.Debugflag,
+			LogFile:               c.Slog.ToFilePath,
+			DebugFlag:             c.Slog.DebugFlag,
 		},
 		"lxplus133.subdo.cern.ch": lbhost.LBHost{ClusterName: c.Cluster_name,
 			HostName:              "lxplus133.subdo.cern.ch",
 			LoadBalancingUsername: c.Loadbalancing_username,
 			LoadBalancingPassword: c.Loadbalancing_password,
-			LogFile:               c.Slog.TofilePath,
-			DebugFlag:             c.Slog.Debugflag,
+			LogFile:               c.Slog.ToFilePath,
+			DebugFlag:             c.Slog.DebugFlag,
 		},
 		"lxplus130.cern.ch": lbhost.LBHost{ClusterName: c.Cluster_name,
 			HostName:              "lxplus130.cern.ch",
 			LoadBalancingUsername: c.Loadbalancing_username,
 			LoadBalancingPassword: c.Loadbalancing_password,
-			LogFile:               c.Slog.TofilePath,
-			DebugFlag:             c.Slog.Debugflag,
+			LogFile:               c.Slog.ToFilePath,
+			DebugFlag:             c.Slog.DebugFlag,
 		},
 	}
 
@@ -58,7 +58,7 @@ func TestGetListHostsOne(t *testing.T) {
 }
 
 func TestGetListHostsTwo(t *testing.T) {
-	lg := lbcluster.Log{Stdout: true, Debugflag: false}
+	lg := lbcluster.Log{Stdout: true, DebugFlag: false}
 
 	clusters := []lbcluster.LBCluster{
 		{Cluster_name: "test01.cern.ch",
