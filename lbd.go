@@ -233,14 +233,14 @@ func checkAliases(config *lbconfig.Config, lg lbcluster.Log, lbclusters []lbclus
 		/* Now, let's go through the hosts, issuing the snmp call */
 		for _, hostValue := range hostsToCheck {
 			go func(myHost lbhost.LBHost) {
-				myHost.Snmp_req()
+				myHost.SnmpReq()
 				myChannel <- myHost
 			}(hostValue)
 		}
 		lg.Debug("Let's start gathering the results")
 		for i := 0; i < len(hostsToCheck); i++ {
 			myNewHost := <-myChannel
-			hostsToCheck[myNewHost.Host_name] = myNewHost
+			hostsToCheck[myNewHost.HostName] = myNewHost
 		}
 
 		lg.Debug("All the hosts have been tested")

@@ -98,15 +98,15 @@ func (lbc *LBCluster) Get_list_hosts(current_list map[string]lbhost.LBHost) {
 	for host := range lbc.Host_metric_table {
 		myHost, ok := current_list[host]
 		if ok {
-			myHost.Cluster_name = myHost.Cluster_name + "," + lbc.Cluster_name
+			myHost.ClusterName = myHost.ClusterName + "," + lbc.Cluster_name
 		} else {
 			myHost = lbhost.LBHost{
-				Cluster_name:           lbc.Cluster_name,
-				Host_name:              host,
-				Loadbalancing_username: lbc.Loadbalancing_username,
-				Loadbalancing_password: lbc.Loadbalancing_password,
-				LogFile:                lbc.Slog.TofilePath,
-				Debugflag:              lbc.Slog.Debugflag,
+				ClusterName:           lbc.Cluster_name,
+				HostName:              host,
+				LoadBalancingUsername: lbc.Loadbalancing_username,
+				LoadBalancingPassword: lbc.Loadbalancing_password,
+				LogFile:               lbc.Slog.TofilePath,
+				DebugFlag:             lbc.Slog.Debugflag,
 			}
 		}
 		current_list[host] = myHost
@@ -292,11 +292,11 @@ func (lbc *LBCluster) EvaluateHosts(hostsToCheck map[string]lbhost.LBHost) {
 
 	for currenthost := range lbc.Host_metric_table {
 		host := hostsToCheck[currenthost]
-		ips, err := host.Get_working_IPs()
+		ips, err := host.GetWorkingIps()
 		if err != nil {
-			ips, err = host.Get_Ips()
+			ips, err = host.GetIps()
 		}
-		lbc.Host_metric_table[currenthost] = Node{host.Get_load_for_alias(lbc.Cluster_name), ips}
+		lbc.Host_metric_table[currenthost] = Node{host.GetLoadForAlias(lbc.Cluster_name), ips}
 		lbc.Write_to_log("DEBUG", fmt.Sprintf("node: %s It has a load of %d", currenthost, lbc.Host_metric_table[currenthost].Load))
 	}
 }
@@ -306,11 +306,11 @@ func (lbc *LBCluster) ReEvaluateHostsForMinimum(hostsToCheck map[string]lbhost.L
 
 	for currenthost := range lbc.Host_metric_table {
 		host := hostsToCheck[currenthost]
-		ips, err := host.Get_all_IPs()
+		ips, err := host.GetAllIps()
 		if err != nil {
-			ips, err = host.Get_Ips()
+			ips, err = host.GetIps()
 		}
-		lbc.Host_metric_table[currenthost] = Node{host.Get_load_for_alias(lbc.Cluster_name), ips}
+		lbc.Host_metric_table[currenthost] = Node{host.GetLoadForAlias(lbc.Cluster_name), ips}
 		lbc.Write_to_log("DEBUG", fmt.Sprintf("node: %s It has a load of %d", currenthost, lbc.Host_metric_table[currenthost].Load))
 	}
 }
