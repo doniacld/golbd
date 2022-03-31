@@ -15,14 +15,15 @@ import (
 )
 
 const (
-	TIMEOUT int    = 10
-	OID     string = ".1.3.6.1.4.1.96.255.1"
+	creationSNMPTimeout int    = 10
+	OID                 string = ".1.3.6.1.4.1.96.255.1"
 )
 
 type TransportResult struct {
 	Transport string
 	IP        net.IP
 	// TODO maybe move this into a struct response
+	// TODO Do not see the point of the Reponse int or string?!
 	ResponseInt    int
 	ResponseString string
 	ResponseError  string
@@ -40,61 +41,16 @@ type LBHost struct {
 }
 
 func (h *LBHost) SnmpReq() {
-
 	h.findTransports()
 
-	for i, myTransport := range h.HostTransports {
-		myTransport.ResponseInt = 100000
-		transport := myTransport.Transport
-		nodeIp := myTransport.IP.String()
-		/* There is no need to put square brackets around the ipv6 addresses*/
-		h.Log(log.LevelDebug, "Checking the host "+nodeIp+" with "+transport)
-		snmp, err := snmplib.NewSNMPv3(nodeIp, h.LoadBalancingUsername, "MD5", h.LoadBalancingPassword, "NOPRIV", h.LoadBalancingPassword,
-			time.Duration(TIMEOUT)*time.Second, 2)
-		if err != nil {
-			// Failed to create snmpgo.SNMP object
-			myTransport.ResponseError = fmt.Sprintf("contacted node: error creating the snmp object: %v", err)
-		} else {
-			// TODO defer in a for loop
-			defer snmp.Close()
-			err = snmp.Discover()
+	for i, hostTransport := range h.HostTransports {
+		hostTransport.ResponseInt = 100000 // TODO why ?
+		transport := hostTransport.Transport
+		nodeIp := hostTransport.IP.String()
 
-			if err != nil {
-				myTransport.ResponseError = fmt.Sprintf("contacted node: error in the snmp discovery: %v", err)
-
-			} else {
-
-				oid, err := snmplib.ParseOid(OID)
-
-				if err != nil {
-					// Failed to parse Oids
-					myTransport.ResponseError = fmt.Sprintf("contacted node: Error parsing the OID %v", err)
-
-				} else {
-					pdu, err := snmp.GetV3(oid)
-
-					if err != nil {
-						myTransport.ResponseError = fmt.Sprintf("contacted node: The getv3 gave the following error: %v ", err)
-
-					} else {
-
-						h.Log(log.LevelInfo, fmt.Sprintf("contacted node: transport: %v ip: %v - reply was %v", transport, nodeIp, pdu))
-
-						//var pduInteger int
-						switch t := pdu.(type) {
-						case int:
-							myTransport.ResponseInt = pdu.(int)
-						case string:
-							myTransport.ResponseString = pdu.(string)
-						default:
-							myTransport.ResponseError = fmt.Sprintf("The node returned an unexpected type %s in %v", t, pdu)
-						}
-					}
-				}
-			}
-		}
-		h.HostTransports[i] = myTransport
-
+		// There is no need to put square brackets around the ipv6 addresses.
+		h.Log(log.LevelDebug, fmt.Sprintf("checking the host %s with %s", nodeIp, transport))
+		h.HostTransports[i] = h.newSNMP(hostTransport)
 	}
 
 	h.Log(log.LevelDebug, "All the ips have been tested")
@@ -102,6 +58,55 @@ func (h *LBHost) SnmpReq() {
 	/*for _, my_transport := range self.Host_transports {
 		self.Write_to_log(lbcluster.LevelInfo, fmt.Sprintf("%v", my_transport))
 	}*/
+}
+
+func (h *LBHost) newSNMP(tr TransportResult) TransportResult {
+	transport := tr.Transport
+	nodeIP := tr.IP.String()
+
+	snmp, err := snmplib.NewSNMPv3(nodeIP, h.LoadBalancingUsername, snmplib.SnmpMD5, h.LoadBalancingPassword, snmplib.SnmpNOPRIV, h.LoadBalancingPassword,
+		time.Duration(creationSNMPTimeout)*time.Second, 2)
+	if err != nil {
+		// Failed to create snmpgo.SNMP object
+		tr.ResponseError = fmt.Sprintf("contacted node: error creating the snmp object: %v", err)
+	} else {
+		// TODO defer in a for loop
+		defer snmp.Close()
+		err = snmp.Discover()
+
+		if err != nil {
+			tr.ResponseError = fmt.Sprintf("contacted node: error in the snmp discovery: %v", err)
+		} else {
+			oid, err := snmplib.ParseOid(OID)
+			if err != nil {
+				// Failed to parse Oids
+				tr.ResponseError = fmt.Sprintf("contacted node: Error parsing the OID %v", err)
+			} else {
+				pdu, err := snmp.GetV3(oid)
+				if err != nil {
+					tr.ResponseError = fmt.Sprintf("contacted node: The getv3 gave the following error: %v ", err)
+				} else {
+					h.Log(log.LevelInfo, fmt.Sprintf("contacted node: transport: %v ip: %v - reply was %v", transport, nodeIP, pdu))
+
+					tr.setPdu(pdu)
+				}
+			}
+		}
+	}
+	return tr
+}
+
+// TODO could we use generics?
+func (tr *TransportResult) setPdu(pdu interface{}) {
+	//var pduInteger int
+	switch t := pdu.(type) {
+	case int:
+		tr.ResponseInt = pdu.(int)
+	case string:
+		tr.ResponseString = pdu.(string)
+	default:
+		tr.ResponseError = fmt.Sprintf("The node returned an unexpected type %s in %v", t, pdu)
+	}
 }
 
 func (h *LBHost) Log(level string, msg string) error {
