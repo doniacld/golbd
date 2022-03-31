@@ -224,7 +224,7 @@ func checkAliases(config *lbconfig.Config, lg logger.Log, lbclusters []lbcluster
 		pc.WriteToLog(logger.LevelDebug, "DO WE HAVE TO UPDATE?")
 		if pc.TimeToRefresh() {
 			pc.WriteToLog(logger.LevelInfo, "Time to refresh the cluster")
-			pc.GetListHosts(hostsToCheck)
+			pc.FillHostsList(hostsToCheck)
 			clustersToUpdate = append(clustersToUpdate, pc)
 		}
 	}

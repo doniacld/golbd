@@ -92,11 +92,11 @@ func (lbc *LBCluster) TimeToRefresh() bool {
 	return lbc.TimeOfLastEvaluation.Add(time.Duration(lbc.Parameters.PollingInterval) * time.Second).Before(time.Now())
 }
 
-// GetListHosts Get the hosts for an alias
-func (lbc *LBCluster) GetListHosts(currentList map[string]lbhost.LBHost) {
+// FillHostsList fills the given hosts list for an alias
+func (lbc *LBCluster) FillHostsList(hostsList map[string]lbhost.LBHost) {
 	lbc.WriteToLog(log.LevelDebug, "Getting the list of hosts for the alias")
 	for host := range lbc.HostMetricTable {
-		myHost, ok := currentList[host]
+		myHost, ok := hostsList[host]
 		if ok {
 			myHost.ClusterName = myHost.ClusterName + "," + lbc.ClusterName
 		} else {
@@ -109,7 +109,7 @@ func (lbc *LBCluster) GetListHosts(currentList map[string]lbhost.LBHost) {
 				DebugFlag:             lbc.Slog.DebugFlag,
 			}
 		}
-		currentList[host] = myHost
+		hostsList[host] = myHost
 	}
 }
 
@@ -253,34 +253,34 @@ func timeoutDialer(cTimeout time.Duration, rwTimeout time.Duration) func(net, ad
 }
 
 func (lbc *LBCluster) checkRogerState(host string) string {
-	logmessage := ""
-
 	connectTimeout := 10 * time.Second
 	readWriteTimeout := 20 * time.Second
 	httpClient := NewTimeoutClient(connectTimeout, readWriteTimeout)
 	response, err := httpClient.Get("http://woger-direct.cern.ch:9098/roger/v1/state/" + host)
 	if err != nil {
-		logmessage = logmessage + fmt.Sprintf("%s", err)
-	} else {
-		defer response.Body.Close()
-		contents, err := ioutil.ReadAll(response.Body)
-		if err != nil {
-			logmessage = logmessage + fmt.Sprintf("%s", err)
-		}
-		var dat map[string]interface{}
-		if err := json.Unmarshal([]byte(contents), &dat); err != nil {
-			logmessage = logmessage + " - " + fmt.Sprintf("%s", host)
-			logmessage = logmessage + " - " + fmt.Sprintf("%v", response.Body)
-			logmessage = logmessage + " - " + fmt.Sprintf("%v", err)
-		}
-		if str, ok := dat["appstate"].(string); ok {
-			if str != "production" {
-				return fmt.Sprintf("node: %s - %s - setting reply -99", host, str)
-			}
-		} else {
-			logmessage = logmessage + fmt.Sprintf("dat[\"appstate\"] not a string for node %s", host)
-		}
+		return fmt.Sprintf("%s", err)
 	}
+	defer response.Body.Close()
+
+	logmessage := ""
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		logmessage = logmessage + fmt.Sprintf("%s", err)
+	}
+	var dat map[string]interface{}
+	if err := json.Unmarshal([]byte(contents), &dat); err != nil {
+		logmessage = logmessage + " - " + fmt.Sprintf("%s", host)
+		logmessage = logmessage + " - " + fmt.Sprintf("%v", response.Body)
+		logmessage = logmessage + " - " + fmt.Sprintf("%v", err)
+	}
+	if str, ok := dat["appstate"].(string); ok {
+		if str != "production" {
+			return fmt.Sprintf("node: %s - %s - setting reply -99", host, str)
+		}
+	} else {
+		logmessage = logmessage + fmt.Sprintf("dat[\"appstate\"] not a string for node %s", host)
+	}
+
 	return logmessage
 
 }

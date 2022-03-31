@@ -52,7 +52,7 @@ func TestGetListHostsOne(t *testing.T) {
 	}
 
 	hosts_to_check := make(map[string]lbhost.LBHost)
-	c.GetListHosts(hosts_to_check)
+	c.FillHostsList(hosts_to_check)
 	if !reflect.DeepEqual(hosts_to_check, expected) {
 		t.Errorf("e.Get_list_hosts: got\n%v\nexpected\n%v", hosts_to_check, expected)
 	}
@@ -117,7 +117,7 @@ func TestGetListHostsTwo(t *testing.T) {
 
 	hosts_to_check := make(map[string]lbhost.LBHost)
 	for _, c := range clusters {
-		c.GetListHosts(hosts_to_check)
+		c.FillHostsList(hosts_to_check)
 	}
 	if !reflect.DeepEqual(hosts_to_check, expected) {
 		t.Errorf("e.Get_list_hosts: got\n%v\nexpected\n%v", hosts_to_check, expected)
