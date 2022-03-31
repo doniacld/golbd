@@ -44,8 +44,8 @@ func (lbc *LBCluster) RefreshDNS(dnsManager, keyPrefix, internalKey, externalKey
 		lbc.WriteToLog(log.LevelWarning, fmt.Sprintf("GetStateDNS Error: %v", err.Error()))
 	}
 
-	pbiDNS := lbc.concatenateIps(lbc.PreviousBestIpsDns)
-	cbi := lbc.concatenateIps(lbc.CurrentBestIps)
+	pbiDNS := lbc.concatenateIps(lbc.PreviousBestIPsDNS)
+	cbi := lbc.concatenateIps(lbc.CurrentBestIPs)
 	if pbiDNS == cbi {
 		lbc.WriteToLog(log.LevelInfo, fmt.Sprintf("DNS not update keyName %v cbh == pbhDns == %v", keyPrefix, cbi))
 		return
@@ -75,8 +75,8 @@ const (
 
 func (lbc *LBCluster) updateDNS(keyName, tsigKey, dnsManager string) error {
 	ttl := defaultTTL
-	if lbc.Parameters.Ttl > defaultTTL {
-		ttl = lbc.Parameters.Ttl
+	if lbc.Parameters.TTL > defaultTTL {
+		ttl = lbc.Parameters.TTL
 	}
 
 	m := new(dns.Msg)
@@ -87,7 +87,7 @@ func (lbc *LBCluster) updateDNS(keyName, tsigKey, dnsManager string) error {
 	m.RemoveRRset([]dns.RR{rrRemoveA})
 	m.RemoveRRset([]dns.RR{rrRemoveAAAA})
 
-	for _, ip := range lbc.CurrentBestIps {
+	for _, ip := range lbc.CurrentBestIPs {
 		var rrInsert dns.RR
 		if ip.To4() != nil {
 			rrInsert, _ = dns.NewRR(fmt.Sprintf("%s. %d IN A %s", lbc.ClusterName, ttl, ip.String()))
@@ -145,7 +145,7 @@ func (lbc *LBCluster) GetStateDNS(dnsManager string) error {
 	}
 
 	lbc.WriteToLog(log.LevelInfo, fmt.Sprintf("Let's keep the list of ips : %v", ips))
-	lbc.PreviousBestIpsDns = ips
+	lbc.PreviousBestIPsDNS = ips
 
 	return nil
 }

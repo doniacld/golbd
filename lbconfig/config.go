@@ -59,8 +59,8 @@ func LoadClusters(config *Config, lg *log.Log) ([]lbcluster.LBCluster, error) {
 		if par, ok := config.Parameters[k]; ok {
 			lbc = lbcluster.LBCluster{ClusterName: k, LoadBalancingUsername: "loadbalancing",
 				LoadBalancingPassword: config.SnmpPassword, Parameters: par,
-				CurrentBestIps:     []net.IP{},
-				PreviousBestIpsDns: []net.IP{},
+				CurrentBestIPs:     []net.IP{},
+				PreviousBestIPsDNS: []net.IP{},
 				Slog:               lg}
 			hm := make(map[string]lbcluster.Node)
 			for _, h := range v {

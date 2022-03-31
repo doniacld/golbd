@@ -32,8 +32,8 @@ type LBCluster struct {
 	HostMetricTable       map[string]Node
 	Parameters            Params
 	TimeOfLastEvaluation  time.Time
-	CurrentBestIps        []net.IP
-	PreviousBestIpsDns    []net.IP
+	CurrentBestIPs        []net.IP
+	PreviousBestIPsDNS    []net.IP
 	CurrentIndex          int
 	Slog                  *log.Log
 }
@@ -46,7 +46,7 @@ type Params struct {
 	Metric          string
 	PollingInterval int
 	Statistics      string
-	Ttl             int
+	TTL             int
 }
 
 // Shuffle pseudo-randomizes the order of elements.
@@ -93,10 +93,10 @@ func (lbc *LBCluster) TimeToRefresh() bool {
 }
 
 // GetListHosts Get the hosts for an alias
-func (lbc *LBCluster) GetListHosts(current_list map[string]lbhost.LBHost) {
+func (lbc *LBCluster) GetListHosts(currentList map[string]lbhost.LBHost) {
 	lbc.WriteToLog(log.LevelDebug, "Getting the list of hosts for the alias")
 	for host := range lbc.HostMetricTable {
-		myHost, ok := current_list[host]
+		myHost, ok := currentList[host]
 		if ok {
 			myHost.ClusterName = myHost.ClusterName + "," + lbc.ClusterName
 		} else {
@@ -109,7 +109,7 @@ func (lbc *LBCluster) GetListHosts(current_list map[string]lbhost.LBHost) {
 				DebugFlag:             lbc.Slog.DebugFlag,
 			}
 		}
-		current_list[host] = myHost
+		currentList[host] = myHost
 	}
 }
 
@@ -150,8 +150,8 @@ func (lbc *LBCluster) FindBestHosts(hostsToCheck map[string]lbhost.LBHost) bool 
 	if !lbc.ApplyMetric(hostsToCheck) {
 		return false
 	}
-	nodes := lbc.concatenateIps(lbc.CurrentBestIps)
-	if len(lbc.CurrentBestIps) == 0 {
+	nodes := lbc.concatenateIps(lbc.CurrentBestIPs)
+	if len(lbc.CurrentBestIPs) == 0 {
 		nodes = "NONE"
 	}
 	lbc.WriteToLog(log.LevelInfo, "best hosts are: "+nodes)
@@ -191,7 +191,7 @@ func (lbc *LBCluster) ApplyMetric(hostsToCheck map[string]lbhost.LBHost) bool {
 			max, listLength, lbc.concatenateNodes(sortedHostList), listLength))
 		max = listLength
 	}
-	lbc.CurrentBestIps = []net.IP{}
+	lbc.CurrentBestIPs = []net.IP{}
 	if listLength == 0 {
 		lbc.WriteToLog(log.LevelError, "cluster has no hosts defined ! Check the configuration.")
 	} else if usefulHosts == 0 {
@@ -208,9 +208,9 @@ func (lbc *LBCluster) ApplyMetric(hostsToCheck map[string]lbhost.LBHost) bool {
 			//Let's shuffle the hosts
 			Shuffle(len(pl), func(i, j int) { pl[i], pl[j] = pl[j], pl[i] })
 			for i := 0; i < max; i++ {
-				lbc.CurrentBestIps = append(lbc.CurrentBestIps, pl[i].IPs...)
+				lbc.CurrentBestIPs = append(lbc.CurrentBestIPs, pl[i].IPs...)
 			}
-			lbc.WriteToLog(log.LevelWarning, fmt.Sprintf("We have put random hosts behind the alias: %v", lbc.CurrentBestIps))
+			lbc.WriteToLog(log.LevelWarning, fmt.Sprintf("We have put random hosts behind the alias: %v", lbc.CurrentBestIPs))
 
 		} else if (lbc.Parameters.Metric == "minino") || (lbc.Parameters.Metric == "cmsweb") {
 			lbc.WriteToLog(log.LevelWarning, "no usable hosts found for cluster! Returning no hosts.")
@@ -224,7 +224,7 @@ func (lbc *LBCluster) ApplyMetric(hostsToCheck map[string]lbhost.LBHost) bool {
 			max = usefulHosts
 		}
 		for i := 0; i < max; i++ {
-			lbc.CurrentBestIps = append(lbc.CurrentBestIps, usefulHostList[i].IPs...)
+			lbc.CurrentBestIPs = append(lbc.CurrentBestIPs, usefulHostList[i].IPs...)
 		}
 	}
 

@@ -55,14 +55,14 @@ func TestEvaluateHosts(t *testing.T) {
 		"monit-kafkax-17be060b0d.cern.ch": lbcluster.Node{Load: 816, IPs: []net.IP{net.ParseIP("188.184.108.100")}},
 	}
 
-	expectedCurrentBestIPs := c.CurrentBestIps
+	expectedCurrentBestIPs := c.CurrentBestIPs
 	expectedTimeOfLastEvaluation := c.TimeOfLastEvaluation
 
 	c.EvaluateHosts(hostsToCheck)
 
 	compareHosts(t, c.HostMetricTable, expectedHostMetricTable)
 
-	compareIPs(t, c.CurrentBestIps, expectedCurrentBestIPs)
+	compareIPs(t, c.CurrentBestIPs, expectedCurrentBestIPs)
 
 	if !reflect.DeepEqual(c.TimeOfLastEvaluation, expectedTimeOfLastEvaluation) {
 		t.Errorf("e.evaluate_hosts: c.Time_of_last_evaluation: got\n%v\nexpected\n%v", c.TimeOfLastEvaluation, expectedTimeOfLastEvaluation)

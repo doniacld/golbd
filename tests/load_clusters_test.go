@@ -24,8 +24,8 @@ func getTestCluster(name string) lbcluster.LBCluster {
 			"monit-kafkax-17be060b0d.cern.ch": lbcluster.Node{Load: 100000, IPs: []net.IP{}}},
 		Parameters: lbcluster.Params{Behaviour: "mindless", BestHosts: 2, External: true, Metric: "cmsfrontier", PollingInterval: 6, Statistics: "long"},
 		//Time_of_last_evaluation time.Time
-		CurrentBestIps:     []net.IP{},
-		PreviousBestIpsDns: []net.IP{},
+		CurrentBestIPs:     []net.IP{},
+		PreviousBestIPsDNS: []net.IP{},
 		Slog:               &lg,
 		CurrentIndex:       0}
 }
@@ -42,8 +42,8 @@ func getSecondTestCluster() lbcluster.LBCluster {
 			"lxplus025.cern.ch":      lbcluster.Node{Load: 100000, IPs: []net.IP{}}},
 		Parameters: lbcluster.Params{Behaviour: "mindless", BestHosts: 10, External: false, Metric: "cmsfrontier", PollingInterval: 6, Statistics: "long"},
 		//Time_of_last_evaluation time.Time
-		CurrentBestIps:     []net.IP{},
-		PreviousBestIpsDns: []net.IP{},
+		CurrentBestIPs:     []net.IP{},
+		PreviousBestIPsDNS: []net.IP{},
 		Slog:               &lg,
 		CurrentIndex:       0}
 }
