@@ -160,13 +160,15 @@ func (h *LBHost) GetWorkingIps() []net.IP {
 	return ips
 }
 
-func (h *LBHost) GetAllIps() ([]net.IP, error) {
-	var myIps []net.IP
-	for _, myTransport := range h.HostTransports {
-		myIps = append(myIps, myTransport.IP)
+// GetAllIps retrieves all the IPs from the host transports
+func (h *LBHost) GetAllIps() []net.IP {
+	ips := make([]net.IP, 0)
+	for _, ht := range h.HostTransports {
+		ips = append(ips, ht.IP)
 	}
-	h.Log(log.LevelInfo, fmt.Sprintf("All ips for this host are %v", myIps))
-	return myIps, nil
+	h.Log(log.LevelInfo, fmt.Sprintf("All ips for this host are %v", ips))
+
+	return ips
 }
 
 func (h *LBHost) GetIps() ([]net.IP, error) {

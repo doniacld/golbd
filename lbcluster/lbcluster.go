@@ -303,10 +303,11 @@ func (lbc *LBCluster) EvaluateHosts(hostsToCheck map[string]lbhost.LBHost) {
 func (lbc *LBCluster) ReEvaluateHostsForMinimum(hostsToCheck map[string]lbhost.LBHost) {
 	for currenthost := range lbc.HostMetricTable {
 		host := hostsToCheck[currenthost]
-		ips, err := host.GetAllIps()
-		if err != nil {
-			ips, err = host.GetIps()
-		}
+		ips := host.GetAllIps()
+		// TODO since GetWorkingIps does not return an error anymore
+		// always call GetIps, do something with the error
+		ips, _ = host.GetIps()
+
 		lbc.HostMetricTable[currenthost] = Node{host.GetLoadForAlias(lbc.ClusterName), ips}
 		lbc.WriteToLog(log.LevelDebug, fmt.Sprintf("node: %s It has a load of %d", currenthost, lbc.HostMetricTable[currenthost].Load))
 	}
