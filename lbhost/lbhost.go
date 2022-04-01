@@ -147,16 +147,17 @@ func (h *LBHost) GetLoadForAlias(clusterName string) int {
 	return load
 }
 
-func (h *LBHost) GetWorkingIps() ([]net.IP, error) {
-	var myIps []net.IP
-	for _, myTransport := range h.HostTransports {
-		if (myTransport.ResponseInt > 0) && (myTransport.ResponseError == "") {
-			myIps = append(myIps, myTransport.IP)
+// GetWorkingIps returns valid ips which means they have a response and no error
+func (h *LBHost) GetWorkingIps() []net.IP {
+	ips := make([]net.IP, 0)
+	for _, ht := range h.HostTransports {
+		if (ht.ResponseInt > 0) && (ht.ResponseError == "") {
+			ips = append(ips, ht.IP)
 		}
-
 	}
-	h.Log(log.LevelInfo, fmt.Sprintf("The ips for this host are %v", myIps))
-	return myIps, nil
+	h.Log(log.LevelInfo, fmt.Sprintf("The ips for this host are %v", ips))
+
+	return ips
 }
 
 func (h *LBHost) GetAllIps() ([]net.IP, error) {
