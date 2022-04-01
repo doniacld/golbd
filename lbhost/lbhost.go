@@ -19,16 +19,6 @@ const (
 	OID                 string = ".1.3.6.1.4.1.96.255.1"
 )
 
-type TransportResult struct {
-	Transport string
-	IP        net.IP
-	// TODO maybe move this into a struct response
-	// TODO Do not see the point of the Reponse int or string?!
-	ResponseInt    int
-	ResponseString string
-	ResponseError  string
-}
-
 type LBHost struct {
 	ClusterName           string
 	HostName              string
@@ -54,6 +44,7 @@ func (h *LBHost) SnmpReq() {
 	}
 
 	h.Log(log.LevelDebug, "All the ips have been tested")
+
 	// TODO is it for debugging?
 	/*for _, my_transport := range self.Host_transports {
 		self.Write_to_log(lbcluster.LevelInfo, fmt.Sprintf("%v", my_transport))
@@ -96,28 +87,16 @@ func (h *LBHost) newSNMP(tr TransportResult) TransportResult {
 	return tr
 }
 
-// TODO could we use generics?
-func (tr *TransportResult) setPdu(pdu interface{}) {
-	//var pduInteger int
-	switch t := pdu.(type) {
-	case int:
-		tr.ResponseInt = pdu.(int)
-	case string:
-		tr.ResponseString = pdu.(string)
-	default:
-		tr.ResponseError = fmt.Sprintf("The node returned an unexpected type %s in %v", t, pdu)
-	}
-}
-
-func (h *LBHost) Log(level string, msg string) error {
-	var err error
+// Log logs in the given file the message depending on the level
+func (h *LBHost) Log(level string, msg string) {
 	if level == log.LevelDebug && !h.DebugFlag {
-		//The debug messages should not appear
-		return nil
+		// The debug messages should not appear
+		return
 	}
 	if !strings.HasSuffix(msg, "\n") {
 		msg += "\n"
 	}
+
 	timestamp := time.Now().Format(time.StampMilli)
 	msg = fmt.Sprintf("%s lbd[%d]: %s: cluster: %s node: %s %s", timestamp, os.Getpid(), level, h.ClusterName, h.HostName, msg)
 
@@ -126,12 +105,16 @@ func (h *LBHost) Log(level string, msg string) error {
 
 	f, err := os.OpenFile(h.LogFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0640)
 	if err != nil {
-		return err
+		fmt.Printf("error while opening file %s: %s\n", h.LogFile, err.Error())
+		return
 	}
 	defer f.Close()
-	_, err = fmt.Fprintf(f, msg)
 
-	return err
+	_, err = fmt.Fprintf(f, msg)
+	if err != nil {
+		fmt.Printf("error while writing in file %s: %s\n", f.Name(), err.Error())
+		return
+	}
 }
 
 func (h *LBHost) GetLoadForAlias(clusterName string) int {
