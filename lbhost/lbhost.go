@@ -117,27 +117,32 @@ func (h *LBHost) Log(level string, msg string) {
 	}
 }
 
+// GetLoadForAlias retrieves the load from the alias of the DNS
+// e.g.: lxplus.cern.ch=179 ; load=179
 func (h *LBHost) GetLoadForAlias(clusterName string) int {
+	// TODO why the load is equal to this magic number?
 	load := -200
 	for _, transport := range h.HostTransports {
 		pduInteger := transport.ResponseInt
 
-		// TODO move this regexp compilation as a const
 		re := regexp.MustCompile(clusterName + "=([0-9]+)")
 		submatch := re.FindStringSubmatch(transport.ResponseString)
 
+		var err error
 		if submatch != nil {
-			// TODO handle the error
-			pduInteger, _ = strconv.Atoi(submatch[1])
+			pduInteger, err = strconv.Atoi(submatch[1])
+			if err != nil {
+				h.Log(log.LevelDebug, fmt.Sprintf("error while converting %v to int", submatch[1]))
+			}
 		}
 
 		if (pduInteger > 0 && pduInteger < load) || (load < 0) {
 			load = pduInteger
 		}
-		h.Log(log.LevelDebug, fmt.Sprintf("Possible load is %v", pduInteger))
-
+		h.Log(log.LevelDebug, fmt.Sprintf("possible load is %v", pduInteger))
 	}
-	h.Log(log.LevelDebug, fmt.Sprintf("THE LOAD IS %v, ", load))
+
+	h.Log(log.LevelDebug, fmt.Sprintf("the load is %v, ", load))
 
 	return load
 }
