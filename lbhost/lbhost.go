@@ -215,18 +215,35 @@ func (h *LBHost) GetIPs() ([]net.IP, error) {
 	return ips, err
 }
 
+const (
+	udp  = "udp"
+	udp6 = "udp6"
+)
+
+// findTransports find the ip behind the given host
 func (h *LBHost) findTransports() {
 	h.Log(log.LevelDebug, "Let's find the ips behind this host")
 
-	ips, _ := h.GetIPs()
+	ips, err := h.GetIPs()
+	if err != nil {
+		h.Log(log.LevelError, fmt.Sprintf("error while retrieving IPs: %q", err))
+		// TODO what is the behavior if there is an error ?
+		return
+	}
+
 	for _, ip := range ips {
-		transport := "udp"
+		transport := udp
 		// If there is an IPv6 address use udp6 transport
 		if ip.To4() == nil {
-			transport = "udp6"
+			transport = udp6
 		}
-		h.HostTransports = append(h.HostTransports, TransportResult{Transport: transport,
-			ResponseInt: 100000, ResponseString: "", IP: ip,
-			ResponseError: ""})
+
+		h.HostTransports = append(h.HostTransports, TransportResult{
+			Transport:      transport,
+			ResponseInt:    100000,
+			ResponseString: "",
+			IP:             ip,
+			ResponseError:  "",
+		})
 	}
 }
