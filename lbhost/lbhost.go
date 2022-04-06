@@ -171,34 +171,47 @@ func (h *LBHost) GetAllIps() []net.IP {
 	return ips
 }
 
-func (h *LBHost) GetIps() ([]net.IP, error) {
-	var ips []net.IP
-	var err error
+var (
+	// TODO Not sure if it has a real interest
+	noHostPattern = regexp.MustCompile(".*no such host")
+)
 
-	re := regexp.MustCompile(".*no such host")
+// GetIps returns a list of available IPs
+// TODO not sure it should still be exposed since it is not used anymore in lbcluster
+func (h *LBHost) GetIps() ([]net.IP, error) {
+	ips := make([]net.IP, 0)
+	var err error
 
 	net.DefaultResolver.StrictErrors = true
 
+	// TODO Why 3 ? It is the number of retries
+	// TODO Should be as configuration but at least a constant
+	// Lookup IPs
 	for i := 0; i < 3; i++ {
 		h.Log(log.LevelInfo, "Getting the ip addresses")
 		ips, err = net.LookupIP(h.HostName)
 		if err == nil {
 			return ips, nil
 		}
-		h.Log(log.LevelWarning, fmt.Sprintf("LookupIP: %v has incorrect or missing IP address (%v) ", h.HostName, err))
-		submatch := re.FindStringSubmatch(err.Error())
+
+		h.Log(log.LevelWarning, fmt.Sprintf("LookupIP: %s has incorrect or missing IP address (%s) ", h.HostName, err.Error()))
+
+		submatch := noHostPattern.FindStringSubmatch(err.Error())
 		if submatch != nil {
 			h.Log(log.LevelInfo, "There is no need to retry this error")
 			return nil, err
 		}
 	}
 
+	// Handle the failure
 	h.Log(log.LevelError, "After several retries, we couldn't get the ips!. Let's try with partial results")
 	net.DefaultResolver.StrictErrors = false
+
 	ips, err = net.LookupIP(h.HostName)
 	if err != nil {
 		h.Log(log.LevelError, fmt.Sprintf("It didn't work :(. This node will be ignored during this evaluation: %v", err))
 	}
+
 	return ips, err
 }
 
