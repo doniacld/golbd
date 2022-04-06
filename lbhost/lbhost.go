@@ -160,8 +160,8 @@ func (h *LBHost) GetWorkingIps() []net.IP {
 	return ips
 }
 
-// GetAllIps retrieves all the IPs from the host transports
-func (h *LBHost) GetAllIps() []net.IP {
+// GetAllIPs retrieves all the IPs from the host transports
+func (h *LBHost) GetAllIPs() []net.IP {
 	ips := make([]net.IP, 0)
 	for _, ht := range h.HostTransports {
 		ips = append(ips, ht.IP)
@@ -176,9 +176,9 @@ var (
 	noHostPattern = regexp.MustCompile(".*no such host")
 )
 
-// GetIps returns a list of available IPs
+// GetIPs returns a list of available IPs
 // TODO not sure it should still be exposed since it is not used anymore in lbcluster
-func (h *LBHost) GetIps() ([]net.IP, error) {
+func (h *LBHost) GetIPs() ([]net.IP, error) {
 	ips := make([]net.IP, 0)
 	var err error
 
@@ -218,7 +218,7 @@ func (h *LBHost) GetIps() ([]net.IP, error) {
 func (h *LBHost) findTransports() {
 	h.Log(log.LevelDebug, "Let's find the ips behind this host")
 
-	ips, _ := h.GetIps()
+	ips, _ := h.GetIPs()
 	for _, ip := range ips {
 		transport := "udp"
 		// If there is an IPv6 address use udp6 transport

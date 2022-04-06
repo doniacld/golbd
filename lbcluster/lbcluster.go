@@ -292,8 +292,8 @@ func (lbc *LBCluster) EvaluateHosts(hostsToCheck map[string]lbhost.LBHost) {
 		host := hostsToCheck[currenthost]
 		ips := host.GetWorkingIps()
 		// TODO since GetWorkingIps was never returning an error; what to do with GetIPs
-		// always call GetIps, do something with the error
-		// ips, _ = host.GetIps()
+		// always call GetIPs, do something with the error
+		// ips, _ = host.GetIPs()
 		lbc.HostMetricTable[currenthost] = Node{host.GetLoadForAlias(lbc.ClusterName), ips}
 		lbc.WriteToLog(log.LevelDebug, fmt.Sprintf("node: %s It has a load of %d", currenthost, lbc.HostMetricTable[currenthost].Load))
 	}
@@ -303,10 +303,10 @@ func (lbc *LBCluster) EvaluateHosts(hostsToCheck map[string]lbhost.LBHost) {
 func (lbc *LBCluster) ReEvaluateHostsForMinimum(hostsToCheck map[string]lbhost.LBHost) {
 	for currenthost := range lbc.HostMetricTable {
 		host := hostsToCheck[currenthost]
-		ips := host.GetAllIps()
+		ips := host.GetAllIPs()
 		// TODO since GetWorkingIps was never returning an error; what to do with GetIPs
-		// always call GetIps, do something with the error
-		// ips, _ = host.GetIps()
+		// always call GetIPs, do something with the error
+		// ips, _ = host.GetIPs()
 
 		lbc.HostMetricTable[currenthost] = Node{host.GetLoadForAlias(lbc.ClusterName), ips}
 		lbc.WriteToLog(log.LevelDebug, fmt.Sprintf("node: %s It has a load of %d", currenthost, lbc.HostMetricTable[currenthost].Load))
